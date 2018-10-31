@@ -1,0 +1,87 @@
+cd 到vargo目录下
+source build/envsetup.sh
+lunch
+mmm packages/apps/.......
+
+
+fidder 抓包工具
+
+
+ubuntu下的任务管理器打开方式：
+命令行输入‘gnome-system-monitor’即可，展示如下
+
+
+
+搜狗输入法出现问题
+
+cd~/.config 
+ls 
+rm -rf
+
+
+
+删除系统应用
+adb remount
+adb shell
+cd system 
+cd priv-app
+rm app-release.apk 
+cd data/data
+rm -rf com.vargo.appking.appstore
+exit
+push system  QuickHall-release.apk
+
+
+
+
+Linux解压rar文件“Parsing filters unsupported” 错误提示
+Linux下解压rar格式文件会出现“Parsing filters unsupported”这样的错误，原因是Linux版本默认不支持rar商业/非自由格式。要解决这个问题只需要安装unrar即可：
+sudo apt-get install unrar
+sudo apt-get install unar
+http://askubuntu.com/questions/801426/parsing-filters-unsupported-error-during-extraction-of-rar-file
+
+
+
+Android 设置快捷方式
+Version=1.0
+Type=Application
+Name=AS
+Exec="/home/yzj/桌面/privacyapp/android-studio/bin/studio.sh" %f
+Icon=/home/yzj/桌面/privacyapp/android-studio/bin/AS.png
+Categories=Development;IDE;
+Terminal=false
+StartupNotify=true
+StartupWMClass=jetbrains-android-studio
+Name[en_GB]=android-studio.desktop
+
+
+
+设置共享文件
+第一步安装samba，命令如下：sudo apt-get install samba
+第二步是右击需要共享的文件夹选择“属性”，然后在属性界面中选择“本地网络共享”，将这里面的三个选项全部勾选住，然后点击“创建共享”，再选“自动添加权限”
+第三步是在“属性”界面选择“权限”选项，全部选“创建和删除文件”
+
+
+
+adb wifi connect
+
+1将手机和电脑通过usb链接
+
+2执行 adb connect
+
+3如果链接成功自己可以使用，链接adb tcpip 5555
+
+
+adb remount失败：
+adb root
+adb disable-verity
+adb reboot
+
+git 命令
+git branch 查看本地分支
+git branch -a 查看所有分支(本地和远程)
+git branch -d name 删除本地name分支
+git push -d origin name 删除远程的name分支
+git reset 撤销add
+
+
