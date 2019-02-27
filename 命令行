@@ -85,3 +85,12 @@ git push -d origin name 删除远程的name分支
 git reset 撤销add
 
 
+
+
+adb强制杀死进程
+
+adb shell am force-stop com.taobao.taobao或者 adb shell pm clear com.taobao.taobao
+
+
+反编译工具jadx
+
