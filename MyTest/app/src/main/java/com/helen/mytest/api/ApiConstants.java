@@ -17,6 +17,5 @@
 package com.helen.mytest.api;
 
 public class ApiConstants {
-//    public static final String NETEAST_HOST = "http://c.m.163.com/";
     public static final String baseUrl = "https://www.wanandroid.com/";
 }

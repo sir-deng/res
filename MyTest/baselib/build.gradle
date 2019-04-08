@@ -61,4 +61,5 @@ dependencies {
     compile 'com.android.support:multidex:1.0.0'//分包
     compile 'com.commit451:PhotoView:1.2.4'//图片缩放
     compile 'com.github.bumptech.glide:glide:3.6.1'//显示图片框架
+    compile "com.github.mzule.activityrouter:activityrouter:$rootProject.routerVersion"
 }

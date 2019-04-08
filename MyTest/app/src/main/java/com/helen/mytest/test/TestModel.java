@@ -22,9 +22,17 @@ public class TestModel implements TestContract.Model {
 //        Observable.create(new Observable.OnSubscribe<String>() {
 //            @Override
 //            public void call(Subscriber<? super String> subscriber) {
-//                subscriber.onNext();
+////                subscriber.onNext();
 //                subscriber.onCompleted();
 //            }
 //        }).compose(RxSchedulers.io_main());
+//        Observable.create(new Observable.OnSubscribe<String>(){
+//            @Override
+//            public void call(Subscriber<? super String> subscriber) {
+//
+//            }
+//        }).compose(R);
+
+
     }
 }

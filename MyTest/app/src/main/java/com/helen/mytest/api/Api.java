@@ -2,25 +2,31 @@ package com.helen.mytest.api;
 
 import android.text.TextUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.helen.baselib.baseapp.BaseApplication;
+import com.helen.baselib.commountutils.LogUtils;
 import com.helen.baselib.commountutils.NetWorkUtils;
+import com.helen.baselib.security.DESBase64Util;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
+import okio.Buffer;
+import okio.BufferedSink;
+import okio.GzipSink;
+import okio.Okio;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Api {
     //读超时长，单位：毫秒
@@ -125,21 +131,83 @@ public class Api {
                 .addNetworkInterceptor(mRewriteCacheControlInterceptor)
                 .addInterceptor(headerInterceptor)
                 .addInterceptor(logInterceptor)
+                .addInterceptor(new GzipRequsetInterceptor())
                 .cache(cache)
                 .build();
 
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").serializeNulls().create();
         retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(CustomConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .baseUrl(ApiConstants.baseUrl)
                 .build();
         apiService = retrofit.create(ApiService.class);
     }
-
+    public static final class ApiHolder{
+        public static final Api instance =  new Api();
+    }
     public static ApiService getDefault() {
+        return ApiHolder.instance.apiService;
+    }
 
-        return new Api().apiService;
+    public class GzipRequsetInterceptor implements Interceptor {
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Request originalRequest = chain.request();
+            if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
+                return chain.proceed(originalRequest);
+            }
+            Request compressedRequest = originalRequest.newBuilder()
+                    .header("Content-Encoding", "gzip")
+                    .method(originalRequest.method(), gzip(originalRequest.body()))
+                    .build();
+            return chain.proceed(compressedRequest);
+        }
+
+        private RequestBody gzip(final RequestBody body) {
+            return new RequestBody() {
+                @Override
+                public MediaType contentType() {
+                    return body.contentType();
+                }
+
+                @Override
+                public long contentLength() throws IOException {
+                    return -1;
+                }
+
+                @Override
+                public void writeTo(BufferedSink sink) throws IOException {
+                    BufferedSink gzipSink = Okio.buffer(new GzipSink(sink));
+                    body.writeTo(gzipSink);
+                    gzipSink.close();
+                }
+            };
+        }
+    }
+    public class RequestEncryptInterceptor implements Interceptor {
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Request request = chain.request();
+            RequestBody body = request.body();
+            Buffer buffer = new Buffer();
+            body.writeTo(buffer);
+            Charset charset = Charset.forName("UTF-8");
+            MediaType contentType = body.contentType();
+            if (contentType != null) {
+                charset = contentType.charset(charset);
+            }
+            String paramsStr = buffer.readString(charset);
+            try {
+                paramsStr = DESBase64Util.encodeInfo(paramsStr);
+            } catch (Exception e) {
+                LogUtils.loge(e,e.toString());
+            }
+            RequestBody requestBody = RequestBody.create(MediaType.parse("text/plain; charset=utf-8"), paramsStr);
+            request = request.newBuilder()
+                    .post(requestBody)
+                    .build();
+            return chain.proceed(request);
+        }
     }
 }
