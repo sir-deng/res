@@ -14,6 +14,6 @@ class WelcomeActivity : AppCompatActivity() {
         logo.setOnClickListener({
             Log.e("点击了","图片被点了")
         })
-
     }
+
 }
